@@ -1,118 +1,119 @@
 <h1 align="center">
-  Tochka Bank API Skill for Claude Code
+  Скилл для Точка Банк API — Claude Code
 </h1>
 
 <p align="center">
-  <strong>A Claude Code skill for the Russian Tochka Bank (Точка.Банк) REST API — invoices (счета), payments, SBP QR codes, Open Banking statements, closing documents, webhooks</strong>
+  <strong>Claude Code скилл для работы с REST API Точка.Банк — счета на оплату, платёжки, СБП, выписки Open Banking, закрывающие документы, вебхуки</strong>
 </p>
 
 <p align="center">
-  <a href="#installation">Installation</a> •
-  <a href="#features">Features</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#safety-hook">Safety Hook</a> •
-  <a href="#documentation">Documentation</a> •
-  <a href="#license">License</a>
+  <a href="#установка">Установка</a> •
+  <a href="#возможности">Возможности</a> •
+  <a href="#использование">Использование</a> •
+  <a href="#хук-подтверждения">Хук подтверждения</a> •
+  <a href="#документация">Документация</a> •
+  <a href="#лицензия">Лицензия</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Skill-blueviolet?style=flat-square" alt="Claude Code Skill">
-  <img src="https://img.shields.io/badge/Tochka_Bank-API-red?style=flat-square" alt="Tochka Bank">
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
+  <img src="https://img.shields.io/badge/Точка.Банк-API-red?style=flat-square" alt="Tochka Bank">
+  <img src="https://img.shields.io/badge/Лицензия-MIT-green?style=flat-square" alt="MIT License">
   <img src="https://img.shields.io/badge/Python-stdlib_only-blue?style=flat-square" alt="stdlib-only">
 </p>
 
 ---
 
-## Overview
+## Обзор
 
-This skill extends [Claude Code](https://claude.ai/code) with specialized knowledge and a stdlib-only Python CLI for the [Tochka Bank REST API](https://developers.tochka.com/docs/tochka-api/) — the most developer-friendly of Russian business banks. Covers both personal JWT and OAuth 2.0 + Consent authentication, with 19 CLI subcommands for the most common tasks: invoicing, statements, payments, SBP QR codes, webhooks. Verified end-to-end on production as of 2026-04-20.
+Скилл расширяет [Claude Code](https://claude.ai/code) специализированными знаниями и Python-клиентом (только стандартная библиотека) для [REST API Точка.Банк](https://developers.tochka.com/docs/tochka-api/). Покрывает два потока аутентификации — личный JWT и OAuth 2.0 + Consent — и 19 CLI-команд для самых частых задач: выставление счетов, выписки, платёжные поручения, СБП QR-коды, вебхуки. Всё проверено на продакшне по состоянию на 2026-04-20.
 
-## Features
+## Возможности
 
-- **Two authentication flows** — personal JWT (simple, read + payment drafts) or OAuth 2.0 + Consent (full invoicing + Open Banking statements)
-- **Keychain-backed credentials** — tokens stored in macOS Keychain / Linux secret-tool / Windows Credential Manager, with file fallback; OAuth access_token auto-refreshed
-- **Interactive wizards** — `init` and `init --oauth` with TTY preflight, app-registration guidance, and local HTTPS callback server (mkcert-aware)
-- **19 CLI subcommands** covering:
-  - **Accounts & balances** — `list-accounts`, `get-balance`
-  - **Incoming payments** — `list-incoming` (SBP + card via acquiring)
-  - **Outgoing drafts** — `list-for-sign` («На подпись»)
-  - **Full bank statement** — `list-statement` (Open Banking async flow)
-  - **Invoices (счета)** — `create-invoice`, `send-invoice` with PDF auto-download
-  - **Closing documents** — акт / УПД / ТОРГ-12 / счёт-фактура via `create-closing-doc`
-  - **Payment links** (интернет-эквайринг) — `create-payment-link`
-  - **Webhooks** — `register-webhook` / `test-webhook` / `list-webhooks` / `delete-webhook`
-  - **Acquiring registry** — daily reconciliation via `list-registry`
-  - **OAuth consent introspection** — diagnose 403 scope issues with `list-consents` / `get-consent`
-- **`--format {json,id,url}`** on `create-*` commands — get a single ID or URL on stdout for shell pipelines, envelope on stderr (no `jq` needed)
-- **18-row error → fix cheatsheet** in SKILL.md — maps the most common prod errors to root cause and remedy
-- **Optional safety hook** — Claude Code permission prompt with `[PROD]` / `[SANDBOX]` labels before every state-changing call
-- **Offline OpenAPI spec** — `references/swagger.json` for greppable schema lookup via `jq` (OpenAPI 3.1.0, Tochka.API v1.90.4-stable)
+- **Два потока аутентификации** — личный JWT (просто, для чтения + черновики платёжек) или OAuth 2.0 + Consent (полный Invoice API + Open Banking выписки)
+- **Хранилище с шифрованием** — токены в macOS Keychain / Linux secret-tool / Windows Credential Manager, файловый fallback; access_token OAuth автоматически обновляется
+- **Интерактивные визарды** — `init` и `init --oauth` с проверкой TTY, подсказками по регистрации приложения и локальным HTTPS-callback сервером (с поддержкой mkcert)
+- **19 CLI-команд**, охватывающих:
+  - **Счета и балансы** — `list-accounts`, `get-balance`
+  - **Входящие платежи** — `list-incoming` (СБП + карты через эквайринг)
+  - **Черновики платёжек** — `list-for-sign` («На подпись»)
+  - **Полная выписка** — `list-statement` (асинхронный Open Banking flow)
+  - **Счета на оплату** — `create-invoice`, `send-invoice` с автозагрузкой PDF
+  - **Закрывающие документы** — акт / УПД / ТОРГ-12 / счёт-фактура через `create-closing-doc`
+  - **Платёжные ссылки** (интернет-эквайринг) — `create-payment-link`
+  - **Вебхуки** — `register-webhook` / `test-webhook` / `list-webhooks` / `delete-webhook`
+  - **Реестр эквайринга** — суточная сверка через `list-registry`
+  - **Диагностика OAuth consent** — `list-consents` / `get-consent`
+- **Флаг `--format {json,id,url}`** у `create-*` команд — получить только ID или URL в stdout (envelope в stderr), без `jq`
+- **Шпаргалка error → fix** (18 строк) — конкретные ошибки продакшна с причиной и исправлением
+- **Опциональный хук безопасности** — запрос подтверждения в Claude Code с метками `[PROD]` / `[SANDBOX]` перед каждым изменяющим вызовом
+- **Offline OpenAPI-спека** — `references/swagger.json` (OpenAPI 3.1.0, Tochka.API v1.90.4-stable) для поиска схем через `jq`
 
-## Installation
+## Установка
 
-### Option 1 — Project scope (this repo only)
+### Вариант 1 — уровень проекта (только этот репозиторий)
 
 ```bash
 mkdir -p .claude/skills
 git clone https://github.com/rodion-m/tochka-bank-skill.git .claude/skills/tochka-bank-api
 ```
 
-### Option 2 — User scope (all projects)
+### Вариант 2 — уровень пользователя (все проекты)
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/rodion-m/tochka-bank-skill.git ~/.claude/skills/tochka-bank-api
 ```
 
-Restart Claude Code after cloning for the skill to be detected.
+После клонирования перезапустите Claude Code, чтобы скилл был обнаружен.
 
-### First-time setup
+### Первоначальная настройка
 
-The skill ships with interactive wizards. Pick ONE based on your goal:
+Скилл поставляется с интерактивными визардами. Выберите **один** вариант в зависимости от задачи:
 
 ```bash
-# Simple: personal JWT from ЛК Точки. Good for reading + payment drafts.
-# Does NOT cover invoices or full statement (those return 501 under JWT).
+# Просто: личный JWT из ЛК Точки. Подходит для чтения + черновиков платёжек.
+# НЕ покрывает счета и выписки (возвращают 501 с личным JWT).
 ! python3 .claude/skills/tochka-bank-api/scripts/tochka_client.py init
 
-# Full: OAuth 2.0 + Consent. Needed for invoices, closing documents, Open Banking statement.
-# Requires a one-time app registration at https://i.tochka.com/bank/services/m/integration/new.
+# Полный: OAuth 2.0 + Consent. Нужен для счетов, закрывающих документов, выписок.
+# Требует однократной регистрации приложения на https://i.tochka.com/bank/services/m/integration/new
 ! python3 .claude/skills/tochka-bank-api/scripts/tochka_client.py init --oauth
 ```
 
-The `!` prefix is **mandatory** — the wizard reads secrets via `getpass`, which needs a real TTY that Claude Code's Bash tool can't provide. The preflight check exits with this exact reminder if run without a TTY.
+Префикс `!` **обязателен** — визард читает секреты через `getpass`, которому нужен настоящий TTY. Bash-инструмент Claude Code TTY не предоставляет; визард проверяет это при запуске и сразу выдаёт понятную подсказку.
 
-Adjust the path to `~/.claude/skills/tochka-bank-api/...` if you installed to user scope.
+Для уровня пользователя замените `.claude/skills/tochka-bank-api/` на `~/.claude/skills/tochka-bank-api/`.
 
-## Usage
+## Использование
 
-Once installed, Claude Code automatically invokes this skill on Russian-banking tasks. Examples:
+После установки Claude Code автоматически подключает скилл при задачах, связанных с Точка.Банком. Примеры:
 
 ```
-> Выставь счёт через Точку на 50000 рублей для ООО «Ромашка»
+> Выставь счёт через Точку на 50 000 рублей для ООО «Ромашка»
 > Получи выписку из Точки за последнюю неделю
-> Зарегистрируй webhook на incomingPayment к https://receiver.example.com/tochka
+> Зарегистрируй вебхук на incomingPayment к https://receiver.example.com/tochka
 > Какие платёжки ждут подписания в Точке?
 > Проверь баланс счёта в Точке
+> Создай закрывающий акт по счёту №7
 ```
 
-The agent consults [SKILL.md](SKILL.md) for the task → subcommand mapping, checks the `--format` options for pipeline-friendly output, and falls back to [references/endpoints.md](references/endpoints.md) or [ReDoc](https://enter.tochka.com/doc/v2/redoc) when it hits schema questions.
+Агент обращается к [SKILL.md](SKILL.md) за маппингом задача → команда, использует `--format` для pipeline-friendly вывода и при необходимости заглядывает в [references/endpoints.md](references/endpoints.md) или [ReDoc](https://enter.tochka.com/doc/v2/redoc).
 
-## Safety Hook
+## Хук подтверждения
 
-State-changing API calls (issuing invoices, dispatching payment orders, registering SBP QR codes, configuring webhooks) touch real money or persistent bank records. This repo ships an **optional but strongly recommended** Claude Code hook at [`hooks/tochka-require-confirmation.sh`](hooks/tochka-require-confirmation.sh) that forces a confirmation prompt before each.
+Изменяющие вызовы к API (выставление счетов, отправка платёжных поручений, регистрация СБП QR-кодов, настройка вебхуков) затрагивают реальные деньги или постоянные записи в банке. В репозитории есть **опциональный, но настоятельно рекомендуемый** хук [`hooks/tochka-require-confirmation.sh`](hooks/tochka-require-confirmation.sh), который требует подтверждения перед каждым таким вызовом.
 
-Install:
+Установка:
 
 ```bash
-# 1. Copy the hook script to your project's hooks directory
+# 1. Скопируйте хук-скрипт
 mkdir -p .claude/hooks
 cp .claude/skills/tochka-bank-api/hooks/tochka-require-confirmation.sh .claude/hooks/
 chmod +x .claude/hooks/tochka-require-confirmation.sh
 ```
 
-2. Register it in `.claude/settings.json` (add the `hooks` block alongside your existing config):
+2. Зарегистрируйте в `.claude/settings.json` (добавьте блок `hooks` к существующей конфигурации):
 
 ```json
 {
@@ -133,36 +134,36 @@ chmod +x .claude/hooks/tochka-require-confirmation.sh
 }
 ```
 
-Now every `curl -X POST|PUT|PATCH|DELETE` to `enter.tochka.com` and every state-changing subcommand (`create-invoice`, `send-invoice`, `create-closing-doc`, `send-closing-doc`, `delete-closing-doc`, `register-webhook`, `delete-webhook`, `test-webhook`, `create-payment-link`) triggers a Claude Code permission prompt labelled:
+Хук показывает запрос подтверждения Claude Code с меткой `[PROD]` или `[SANDBOX]` и именем команды перед каждым изменяющим вызовом:
 
-- `[PROD] create-invoice — real money / bank records may be affected`
-- `[SANDBOX] create-invoice — sandbox only, safe to allow`
+- `[PROD] create-invoice — реальные деньги / банковские записи могут быть затронуты`
+- `[SANDBOX] create-invoice — только песочница, безопасно разрешить`
 
-Read-only calls (`list-*`, `get-*`, `config`, `init` validation) pass through silently.
+Read-only команды (`list-*`, `get-*`, `config`, валидация `init`) проходят без запросов.
 
-## Documentation
+## Документация
 
-- [`SKILL.md`](SKILL.md) — the router agents read on trigger: Quickstart (goal-branched), capability matrix (JWT vs OAuth), task → subcommand table, critical gotchas, day-to-day commands, hook explanation, error → fix cheatsheet
-- [`references/auth.md`](references/auth.md) — JWT vs OAuth deep-dive, full authoritative permissions list (19 values), wizard internals, OAuth app-registration pitfalls (incl. the `localhost` vs `127.0.0.1` gotcha)
-- [`references/endpoints.md`](references/endpoints.md) — body schemas, validation rules, field reference for all 19+ endpoints; ИП vs ООО field differences for invoicing
-- [`references/webhooks.md`](references/webhooks.md) — signature verification (via OIDC discovery), retry semantics, idempotency guidance
-- [`references/swagger.json`](references/swagger.json) — offline OpenAPI 3.1.0 spec (447 KB) for greppable `jq` lookup. Source: `https://enter.tochka.com/doc/openapi/swagger.json`
+- [`SKILL.md`](SKILL.md) — роутер для агентов: Quickstart (с выбором по цели), матрица возможностей JWT vs OAuth, таблица задача → команда, критичные ошибки схемы, команды на каждый день, шпаргалка error → fix
+- [`references/auth.md`](references/auth.md) — JWT vs OAuth в деталях, полный авторитетный список разрешений (19 значений), устройство визардов, подводные камни регистрации OAuth-приложения (в т.ч. баг `localhost` vs `127.0.0.1`)
+- [`references/endpoints.md`](references/endpoints.md) — схемы тел запросов, правила валидации, справочник полей для 19+ эндпоинтов; различия полей для ИП vs ООО при выставлении счетов
+- [`references/webhooks.md`](references/webhooks.md) — верификация подписи (через OIDC discovery), семантика повторных попыток, идемпотентность
+- [`references/swagger.json`](references/swagger.json) — offline OpenAPI 3.1.0 спека (447 КБ) для поиска схем через `jq`. Источник: `https://enter.tochka.com/doc/openapi/swagger.json`
 
-## Caveats
+## Ограничения
 
-- **Not a multi-tenant SaaS helper.** OAuth mode *supports* multi-tenant, but the wizards are optimised for "I own the account" automation.
-- **Not for other Russian banks.** Tinkoff, Sber, VTB have different schemas — don't port examples.
-- **Tochka API deviates from АФТ/ОБР standards** (ЦБ Accounts v2.0/v3.0, Payment Initiation v1.0.0, ФАПИ Advanced v2.0). Expect a schema watershed around **01.10.2026** when the official v2.0 standards kick in. Don't copy OBR/OBIE examples hoping they work on Tochka.
-- Some endpoint paths and field names rotate without strict semver — always verify against live [ReDoc](https://enter.tochka.com/doc/v2/redoc) before shipping code.
+- **Не для мультитенантного SaaS.** OAuth поддерживает мультитенантность, но визарды оптимизированы под автоматизацию «своего» аккаунта.
+- **Только Точка.Банк.** У Тинькофф, Сбера, ВТБ другие схемы — не переносите примеры.
+- **Отличие от стандартов АФТ/ОБР.** API Точки не соответствует утверждённым ЦБ стандартам АФТ (wiki.openbankingrussia.ru, Accounts v2.0/v3.0, ФАПИ Advanced v2.0). Ожидайте смену схем около **01.10.2026**.
+- Некоторые пути и имена полей меняются без строгого semver — всегда сверяйтесь с живым [ReDoc](https://enter.tochka.com/doc/v2/redoc) перед деплоем.
 
-## Contributing
+## Вклад в проект
 
-Issues and PRs welcome. Especially useful:
+Приветствуются issues и PR. Особенно полезны:
 
-- New error-message rows for the cheatsheet (with exact error string + root cause + fix).
-- Schema diffs if Tochka ships breaking changes.
-- SBP operations verification (none of the SBP endpoints are live-tested in this skill — schemas are from swagger + ReDoc, not end-to-end prod calls).
+- Новые строки в шпаргалку error → fix (точная строка ошибки + причина + исправление).
+- Обновления схем при breaking changes Точки.
+- Верификация СБП-операций вживую (в скилле нет live-проверенных СБП-вызовов — схемы из swagger + ReDoc).
 
-## License
+## Лицензия
 
-[MIT](LICENSE) — use, fork, adapt freely.
+[MIT](LICENSE) — используйте, форкайте, адаптируйте свободно.
