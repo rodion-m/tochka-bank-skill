@@ -55,14 +55,14 @@ This skill extends [Claude Code](https://claude.ai/code) with specialized knowle
 
 ```bash
 mkdir -p .claude/skills
-git clone https://github.com/rodion-m/tochka-bank-api-skill.git .claude/skills/tochka-bank-api
+git clone https://github.com/rodion-m/tochka-bank-skill.git .claude/skills/tochka-bank-api
 ```
 
 ### Option 2 — User scope (all projects)
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/rodion-m/tochka-bank-api-skill.git ~/.claude/skills/tochka-bank-api
+git clone https://github.com/rodion-m/tochka-bank-skill.git ~/.claude/skills/tochka-bank-api
 ```
 
 Restart Claude Code after cloning for the skill to be detected.
